@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>For You ♡</title>
+  <link rel="stylesheet" href="bday_letter.css">
+</head>
+<body>
+
+  <!-- ambient petal rain -->
+  <div id="petals"></div>
+
+  <!-- number drawing canvas -->
+  <canvas id="numberCanvas"></canvas>
+
+  <!-- music toggle -->
+  <button id="musicBtn" title="Toggle music" onclick="toggleMusic()">♪</button>
+
+  <!-- main stage -->
+  <div id="stage">
+    <div id="envelopeWrap" onclick="handleClick()">
+      <svg id="envelopeSVG" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">
+        <!-- shadow -->
+        <ellipse cx="160" cy="215" rx="130" ry="8" fill="rgba(168,91,110,0.08)"/>
+        <!-- body -->
+        <rect class="env-body" x="20" y="50" width="280" height="160" rx="6"/>
+        <!-- bottom fold lines (V shape) -->
+        <polyline class="env-line" points="20,210 160,130 300,210"/>
+        <!-- left & right fold lines -->
+        <line class="env-line" x1="20" y1="50" x2="160" y2="130"/>
+        <line class="env-line" x1="300" y1="50" x2="160" y2="130"/>
+        <!-- flap -->
+        <polygon id="envFlap" class="env-flap" points="20,50 160,30 300,50 160,140"/>
+        <!-- seal -->
+        <g id="seal">
+          <circle cx="160" cy="130" r="18" fill="#f5c6c6" stroke="#d4899a" stroke-width="1"/>
+          <text x="160" y="136" text-anchor="middle" font-family="'Great Vibes', cursive" font-size="16" fill="#a85b6e">♡</text>
+        </g>
+      </svg>
+      <div id="innerGlow"></div>
+    </div>
+  </div>
+
+  <p id="hint">touch to begin</p>
+
+  <!-- letter overlay -->
+  <div id="letterOverlay">
+    <div id="letterScroll">
+      <div id="letterInner">
+
+        <h1 class="letter-heading">Happy Birthday</h1>
+        <p class="letter-subhead">a letter written just for you</p>
+
+        <div class="letter-divider">♡</div>
+
+        <p class="letter-body">
+          Twenty-two years ago, the world quietly received one of its most extraordinary gifts —
+          and most people had no idea. But the universe did. The stars did.
+          And somewhere, in the soft hum of everything, so did I.
+        </p>
+
+        <div class="hearts-row">♡ · · · ♡</div>
+
+        <p class="letter-body">
+          I have watched you laugh at your own jokes before the punchline arrives,
+          the way your eyes crinkle first, giving it all away — and I have never wanted
+          to look anywhere else. Your laugh is my favourite sound in every room.
+        </p>
+
+        <div class="letter-divider">·</div>
+
+        <p class="letter-body normal">
+          There is a specific kind of <strong>magic</strong> in the way you move through this world —
+          the quiet thoughtfulness you carry, the warmth you leave behind in every conversation,
+          the way you notice the small beautiful things that most people walk past.
+          You have always seen the world in a frequency I am still learning to hear.
+        </p>
+
+        <div class="hearts-row">♡ · · · ♡</div>
+
+        <p class="letter-body">
+          On the days you doubt yourself — and I know those days come, even for people as
+          remarkable as you — I hope you hear this: you are not too much, and you are
+          not too little. You are precisely, wonderfully, <em>exactly enough</em>.
+          You have always been.
+        </p>
+
+        <div class="letter-divider">♡</div>
+
+        <p class="letter-body normal">
+          I think about the version of me that existed before knowing you,
+          and I feel only a gentle sort of sympathy for that person.
+          Because they had not yet learned what it is to have someone in your corner
+          who genuinely, completely, <strong>deeply</strong> believes in you.
+          You have changed the shape of my days.
+        </p>
+
+        <div class="hearts-row">· ♡ · ♡ · ♡ ·</div>
+
+        <p class="letter-body">
+          So here is my wish for your twenty-second year:
+          that it holds more laughter than you expect,
+          more softness than you anticipate,
+          and at least one moment so beautiful
+          it stops time for a breath —
+          the way you have stopped mine, more than once,
+          without even trying.
+        </p>
+
+        <div class="letter-divider">·</div>
+
+        <p class="letter-body normal">
+          Happy Birthday, my love. <strong>Twenty-two looks extraordinary on you.</strong><br>
+          But then again, everything does.
+        </p>
+
+        <div class="hearts-row">♡ · · · ♡</div>
+
+        <p class="letter-signature">With all of my heart</p>
+        <p class="letter-postscript">always &amp; always &amp; always</p>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="bday_letter.js"></script>
+</body>
+</html>

@@ -1,0 +1,432 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Great+Vibes&family=Montserrat:wght@200;300&display=swap');
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ─── CSS VARIABLES ─── */
+:root {
+  --cream:      #fdf8f2;
+  --blush:      #f5c6c6;
+  --rose:       #d4899a;
+  --deep-rose:  #a85b6e;
+  --gold:       #c9a96e;
+  --soft-gold:  #e8d5b0;
+  --text:       #3a2a2a;
+  --text-light: #7a5a5a;
+}
+
+/* ─── BASE ─── */
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--cream);
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--text);
+  /* Safe area for notched phones */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* ─── AMBIENT BACKGROUND ─── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(245,198,198,0.25) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 90%, rgba(212,137,154,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 50% at 50% 50%, rgba(201,169,110,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── CANVAS FOR "22" ─── */
+#numberCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ─── STAGE ─── */
+#stage {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+/* ─── HINT TEXT ─── */
+#hint {
+  position: fixed;
+  bottom: max(48px, env(safe-area-inset-bottom, 48px) + 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 200;
+  font-size: clamp(9px, 2.5vw, 11px);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  opacity: 0.5;
+  transition: opacity 1s ease;
+  z-index: 10;
+  white-space: nowrap;
+}
+#hint.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ─── ENVELOPE ─── */
+#envelopeWrap {
+  position: relative;
+  /* Scales fluidly: full width on small phones, capped on bigger screens */
+  width: min(320px, 85vw);
+  height: min(220px, calc(85vw * 220 / 320));
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 8px 40px rgba(168,91,110,0.12));
+  /* Prevent tap highlight on mobile */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Hover only on non-touch devices */
+@media (hover: hover) {
+  #envelopeWrap:hover {
+    transform: scale(1.03) translateY(-3px);
+  }
+}
+
+#envelopeWrap.bounce {
+  animation: envBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes envBounce {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.08) translateY(-8px); }
+  60%  { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+#envelopeSVG {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* envelope body */
+.env-body {
+  fill: #fef0e6;
+  stroke: #d4a8a8;
+  stroke-width: 1.2;
+}
+
+/* envelope flap */
+.env-flap {
+  fill: #fbe8e0;
+  stroke: #d4a8a8;
+  stroke-width: 1.2;
+  transform-origin: 160px 30px;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.env-flap.open {
+  transform: rotateX(180deg);
+}
+
+/* inner fold lines */
+.env-line {
+  stroke: #e8c8c8;
+  stroke-width: 0.8;
+  fill: none;
+}
+
+/* seal */
+#seal {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  transform-origin: 160px 110px;
+}
+#seal.hidden {
+  opacity: 0;
+  transform: scale(0) rotate(20deg);
+}
+
+/* glow from inside */
+#innerGlow {
+  position: absolute;
+  bottom: min(20px, 8%);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 62%;
+  height: 60px;
+  background: radial-gradient(ellipse, rgba(255,220,180,0.9) 0%, transparent 70%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease;
+  filter: blur(8px);
+}
+#innerGlow.visible {
+  opacity: 1;
+}
+
+/* ─── FLOATING HEARTS ─── */
+.heart-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 8;
+  font-size: 16px;
+  opacity: 0;
+  animation: floatHeart 4s ease-out forwards;
+}
+
+@keyframes floatHeart {
+  0%   { opacity: 0;   transform: translateY(0)     scale(0.4) rotate(0deg); }
+  15%  { opacity: 0.9; transform: translateY(-30px)  scale(1)   rotate(-8deg); }
+  80%  { opacity: 0.5; transform: translateY(-220px) scale(0.8) rotate(10deg); }
+  100% { opacity: 0;   transform: translateY(-300px) scale(0.5) rotate(-5deg); }
+}
+
+/* ─── SPARKLE PARTICLES ─── */
+.sparkle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 8;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+  opacity: 0;
+  animation: sparkleAnim 1.2s ease-out forwards;
+}
+
+@keyframes sparkleAnim {
+  0%   { opacity: 0; transform: scale(0); }
+  30%  { opacity: 1; transform: scale(1.5); }
+  100% { opacity: 0; transform: scale(0) translate(var(--dx), var(--dy)); }
+}
+
+/* ─── LETTER OVERLAY ─── */
+#letterOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--cream);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease;
+}
+#letterOverlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+#letterScroll {
+  width: min(640px, 92vw);
+  height: 78vh;
+  overflow: hidden;
+  position: relative;
+  mask-image: linear-gradient(to bottom,
+    transparent 0%,
+    black 10%,
+    black 88%,
+    transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom,
+    transparent 0%,
+    black 10%,
+    black 88%,
+    transparent 100%);
+}
+
+#letterInner {
+  padding: clamp(40px, 8vw, 80px) clamp(16px, 5vw, 20px) clamp(60px, 12vw, 120px);
+  transform: translateY(100%);
+  transition: none;
+}
+#letterInner.scrolling {
+  animation: scrollUp var(--scroll-duration, 60s) linear forwards;
+  animation-delay: 1.8s;
+}
+
+@keyframes scrollUp {
+  from { transform: translateY(40%); }
+  to   { transform: translateY(-100%); }
+}
+
+/* ─── LETTER TYPOGRAPHY ─── */
+.letter-heading {
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(36px, 10vw, 68px);
+  color: var(--deep-rose);
+  text-align: center;
+  margin-bottom: 10px;
+  line-height: 1.1;
+}
+
+.letter-subhead {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 200;
+  font-size: clamp(8px, 2.2vw, 10px);
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--rose);
+  text-align: center;
+  margin-bottom: clamp(30px, 7vw, 56px);
+}
+
+.letter-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: clamp(20px, 5vw, 40px) auto;
+  width: min(220px, 70vw);
+  color: var(--soft-gold);
+  font-size: 14px;
+}
+.letter-divider::before,
+.letter-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--soft-gold), transparent);
+}
+
+.letter-body {
+  font-size: clamp(14px, 3.8vw, 18px);
+  line-height: 1.9;
+  color: var(--text);
+  font-style: italic;
+  font-weight: 300;
+  text-align: center;
+  margin-bottom: clamp(18px, 4vw, 28px);
+}
+.letter-body.normal {
+  font-style: normal;
+}
+.letter-body strong {
+  font-weight: 400;
+  color: var(--deep-rose);
+}
+.letter-body em {
+  color: var(--rose);
+  font-style: italic;
+}
+
+.letter-signature {
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(26px, 8vw, 46px);
+  color: var(--deep-rose);
+  text-align: center;
+  margin-top: clamp(36px, 8vw, 60px);
+}
+
+.letter-postscript {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 200;
+  font-size: clamp(9px, 2.5vw, 11px);
+  letter-spacing: 0.25em;
+  color: var(--text-light);
+  text-align: center;
+  margin-top: 16px;
+  opacity: 0.7;
+}
+
+.hearts-row {
+  text-align: center;
+  font-size: clamp(14px, 4vw, 18px);
+  letter-spacing: 0.5em;
+  color: var(--rose);
+  margin: clamp(12px, 3vw, 20px) 0;
+  opacity: 0.7;
+}
+
+/* ─── MUSIC BUTTON ─── */
+#musicBtn {
+  position: fixed;
+  top: max(20px, env(safe-area-inset-top, 20px) + 8px);
+  right: max(20px, env(safe-area-inset-right, 20px) + 8px);
+  width: clamp(36px, 10vw, 40px);
+  height: clamp(36px, 10vw, 40px);
+  border: 1px solid rgba(212,137,154,0.4);
+  border-radius: 50%;
+  background: rgba(253,248,242,0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(14px, 4vw, 16px);
+  transition: all 0.3s ease;
+  opacity: 0;
+  color: var(--rose);
+  /* No tap flash on mobile */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+#musicBtn.visible {
+  opacity: 1;
+}
+@media (hover: hover) {
+  #musicBtn:hover {
+    background: rgba(245,198,198,0.4);
+    transform: scale(1.1);
+  }
+}
+
+/* ─── PETAL RAIN ─── */
+.petal {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  font-size: 12px;
+  animation: petalFall linear forwards;
+}
+
+@keyframes petalFall {
+  0%   { opacity: 0;   transform: translateY(-20px)  rotate(0deg); }
+  10%  { opacity: 0.4; }
+  90%  { opacity: 0.3; }
+  100% { opacity: 0;   transform: translateY(110vh) rotate(720deg); }
+}
+
+/* ─── SMALL PHONE (≤ 380px) ─── */
+@media (max-width: 380px) {
+  .letter-body {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .letter-heading {
+    font-size: 34px;
+  }
+}
+
+/* ─── LANDSCAPE MOBILE ─── */
+@media (max-height: 500px) and (orientation: landscape) {
+  #envelopeWrap {
+    width: min(240px, 40vw);
+    height: min(165px, calc(40vw * 220 / 320));
+  }
+  #hint {
+    bottom: max(16px, env(safe-area-inset-bottom, 16px) + 8px);
+    font-size: 9px;
+  }
+  #letterScroll {
+    height: 82vh;
+  }
+}
